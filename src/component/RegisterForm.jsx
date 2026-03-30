@@ -62,7 +62,7 @@ const RegisterForm = () => {
                      if (loginRes?.ok) {
                             toast.success("Logged in successfully");
                             reset();
-                            router.push("/role");
+                            router.push("/");
                      }
               } catch (error) {
                      toast.error("Something went wrong");
