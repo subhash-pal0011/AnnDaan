@@ -4,44 +4,48 @@ import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 
 const OtpPage = ({ otpEmail, otpPassword }) => {
+
+       const router = useRouter()
        const {
               register,
               handleSubmit,
               formState: { isSubmitting },
        } = useForm();
-       const router = useRouter();
+
 
        const onSubmit = async (data) => {
               const otp = Object.values(data.otp).join("");
-
               try {
                      const res = await axios.post("/api/auth/verifyOtpEmail", {
                             email: otpEmail,
                             otp,
                      });
-
                      if (res.data.success) {
                             toast.success(res.data.message);
-
-                            // Auto login after OTP verification
-                            const loginRes = await signIn("credentials", {
-                                   email: otpEmail,
-                                   password: otpPassword,
-                                   redirect: false,
-                            });
-                            console.log("loginRes", loginRes);
-                            if (loginRes?.ok) {
-                                   router.push("/editProfile");
-                            } else {
-                                   toast.error("Auto login failed");
+                            try {
+                                   const loginRes = await signIn("credentials", {
+                                          email: otpEmail,
+                                          password: otpPassword,
+                                          redirect: false,
+                                   });
+                                   if (loginRes?.ok) {
+                                          router.push("/role");
+                                   } else {
+                                          toast.error("Auto login failed");
+                                   }
+                            } catch (loginError) {
+                                   console.log("Login error:", loginError);
+                                   toast.error("Login failed after OTP");
                             }
                      }
               } catch (error) {
-                     toast.error(error.response?.data?.message || "Something went wrong");
+                     console.log("OTP error:", error);
+                     toast.error(error?.response?.data?.message || "Something went wrong");
               }
        };
 
@@ -64,7 +68,7 @@ const OtpPage = ({ otpEmail, otpPassword }) => {
                                                         initial={{ x: 40, opacity: 0 }}
                                                         animate={{ x: 0, opacity: 1 }}
                                                         transition={{ delay: index * 0.2, duration: 0.4 }}
-                                                        className="w-12 h-12 text-lg text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                                                        className="w-12 h-12 text-lg text-center border border-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                                                         {...register(`otp.${index}`, { required: true, pattern: /^[0-9]$/ })}
                                                         onInput={(e) => {
                                                                e.target.value = e.target.value.replace(/[^0-9]/g, "");

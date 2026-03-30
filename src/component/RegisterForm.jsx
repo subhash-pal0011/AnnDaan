@@ -7,10 +7,10 @@ import { FaRegEyeSlash } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import OtpPage from "./OtpPage";
+import { toast } from "sonner";
 
 
 const RegisterForm = () => {
@@ -39,30 +39,30 @@ const RegisterForm = () => {
                             setOtpPassword(data.password);
                      }
               } catch (error) {
-                     // handle 409 Conflict if email already exists
-                     if (error.response?.status === 409) {
-                            toast.error("Email already registered. Try logging in!");
-                            setLoginForm(true);
-                     } else {
-                            toast.error(error?.response?.data?.message || "Something went wrong");
-                     }
                      console.log("register error:", error);
+                     toast.error(error?.response?.data?.message)
               }
        };
 
-       const onLogin = async (data) => {
+
+
+       const handelLogin = async (data) => {
               try {
                      const loginRes = await signIn("credentials", {
                             email: data.email,
                             password: data.password,
                             redirect: false,
                      });
+
+                     if (loginRes?.error) {
+                            toast.error(loginRes.error || "User not exists"); 
+                            return;
+                     }
+
                      if (loginRes?.ok) {
                             toast.success("Logged in successfully");
                             reset();
-                            router.push("/editProfile");
-                     } else {
-                            toast.error(loginRes?.error || "Invalid email or password");
+                            router.push("/role");
                      }
               } catch (error) {
                      toast.error("Something went wrong");
@@ -70,7 +70,7 @@ const RegisterForm = () => {
               }
        };
 
-       // Show OTP page if signup succeeded
+
        if (otpPage) {
               return <OtpPage otpEmail={otpEmail} otpPassword={otpPassword} />;
        }
@@ -109,7 +109,7 @@ const RegisterForm = () => {
 
                             {/* Form */}
                             <form
-                                   onSubmit={handleSubmit(loginForm ? onLogin : onSubmit)}
+                                   onSubmit={handleSubmit(loginForm ? handelLogin : onSubmit)}
                                    className="space-y-6"
                             >
                                    {/* Name */}
@@ -221,7 +221,7 @@ const RegisterForm = () => {
                             {/* Google Login */}
                             <div className="items-center text-center justify-center flex">
                                    <button
-                                          onClick={() => signIn("google", { callbackUrl: "/editProfile" })}
+                                          onClick={() => signIn("google", {callbackUrl: "/role"})}
                                           className="flex items-center gap-2 border p-2 px-5 rounded cursor-pointer"
                                    >
                                           <FcGoogle />{" "}
