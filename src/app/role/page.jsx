@@ -1,4 +1,3 @@
-
 "use client";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -15,7 +14,6 @@ const Page = () => {
               formState: { errors, isSubmitting }
        } = useForm();
 
-
        const router = useRouter()
 
        const onSubmit = async (data) => {
@@ -30,7 +28,7 @@ const Page = () => {
                      console.log("Edit profile error :", error);
               }
        };
-
+      
        return (
               <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200 px-4">
 

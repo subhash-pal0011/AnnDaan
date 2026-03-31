@@ -56,7 +56,7 @@ const Page = () => {
                                                  Home
                                           </Link>
 
-                                          <Link href="/donate" className="text-sm sm:text-base hover:text-gray-400 transition font-semibold">
+                                          <Link href="/donateForm" className="text-sm sm:text-base hover:text-gray-400 transition font-semibold">
                                                  Donate
                                           </Link>
 
