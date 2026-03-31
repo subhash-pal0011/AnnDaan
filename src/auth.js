@@ -87,6 +87,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             token.email = user.email;
                             token.role = user.role;
                      }
+                     try {
+                            if (token?.id) {
+                                   const dbUser = await User.findById(token.id);
+                                   if (dbUser) {
+                                          token.role = dbUser.role; 
+                                   }
+                            }
+                     } catch (error) {
+                            console.error("JWT DB Sync Error:", error);
+                     }
                      return token;
               },
               async session({ session, token }) {
@@ -111,3 +121,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
        secret: process.env.AUTH_SECRET,
 });
+
