@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { TbCurrentLocation } from "react-icons/tb";
 import dynamic from "next/dynamic";
+import { toast } from "sonner";
 const MapView = dynamic(() => import("@/component/MapView"), {
        ssr: false,
 });
@@ -13,6 +14,14 @@ const DonatePage = () => {
        const [aiLoading, setAiLoading] = useState(false);
        const [position, setPosition] = useState(null)
 
+       const {
+              register,
+              handleSubmit,
+              setValue,
+              reset,
+              watch,
+              formState: { errors, isSubmitting },
+       } = useForm();
 
 
        useEffect(() => {
@@ -72,18 +81,9 @@ const DonatePage = () => {
        };
 
 
-
-       const {
-              register,
-              handleSubmit,
-              setValue,
-              watch,
-              formState: { errors, isSubmitting },
-       } = useForm();
-
        const watchAll = watch();
 
-       // 🔥 AI CALL.
+       //  AI CALL.
        const handleAISuggestion = async () => {
               const data = watchAll;
               if (!data.food || !data.date || !data.time || !data.foodType || !data.period) {
@@ -94,7 +94,7 @@ const DonatePage = () => {
                      const res = await axios.post("/api/user/ai", data);
                      setValue("notes", res.data.note);
                      setValue("expiry", res.data.expiry);
-                     setValue("status", res.data.status);
+                     setValue("foodStatus", res.data.status);
                      setValue("color", res.data.color);
                      setValue("safetyScore", res.data.safetyScore);
 
@@ -113,12 +113,17 @@ const DonatePage = () => {
        }, [watchAll.food, watchAll.date, watchAll.time, watchAll.foodType, watchAll.storedInFridge, watchAll.period]);
 
 
-       const onSubmit = (data) => {
-              if (data.status === "Rejected ❌") {
-                     return alert("❌ Unsafe food cannot be donated");
+       const onSubmit = async (data) => {
+              try {
+                     const res = await axios.post("/api/user/donation", data)
+                     if (res.data.success) {
+                            toast.success(res.data.message)
+                            reset()
+                     }
+              } catch (error) {
+                     console.log("donation form error :", error)
+                     toast.error(error?.response?.data?.message)
               }
-              console.log("Final Data:", data);
-              alert("Donation Submitted ✅");
        };
 
        return (
@@ -230,9 +235,6 @@ const DonatePage = () => {
                                                  </p>
                                           )}
                                    </div>
-
-
-
 
 
                                    <div onClick={handleUseCurrentLocation} className="flex items-center gap-1 text-blue-500 cursor-pointer hover:underline">
@@ -365,11 +367,11 @@ const DonatePage = () => {
 
 
                                    {/* STATUS */}
-                                   {watch("status") && (
+                                   {watch("foodStatus") && (
                                           <div
                                                  className={`p-3 rounded-lg text-white text-center font-semibold shadow-xl ${watch("color") === "green" ? "bg-green-500" : watch("color") === "yellow" ? "bg-yellow-500" : "bg-red-500"}`}
                                           >
-                                                 {watch("status")}
+                                                 {watch("foodStatus")}
                                           </div>
                                    )}
 
@@ -407,13 +409,12 @@ const DonatePage = () => {
                                    </button>
 
                                    <button
-                                          disabled={isSubmitting || watch("status") === "Rejected ❌"}
-                                          className={`cursor-pointer w-full py-2 rounded-lg text-white ${watch("status") === "Rejected ❌"
-                                                 ? "bg-gray-400 cursor-not-allowed"
-                                                 : "bg-green-600 hover:bg-green-700"
-                                                 }`}
+                                          disabled={isSubmitting || watch("foodStatus") === "Unsafe"}
+                                          className={`cursor-pointer w-full py-2 text-center items-center justify-center flex rounded-lg text-white ${watch("foodStatus") === "Unsafe" ? "bg-gray-400 cursor-not-allowed" :
+                                                 "bg-green-600 hover:bg-green-700"
+                                          }`}
                                    >
-                                          Submit Donation
+                                          {isSubmitting ? <img src="/loader.gif" className="h-7"/> :  "Submit Donation"}
                                    </button>
 
                             </motion.form>

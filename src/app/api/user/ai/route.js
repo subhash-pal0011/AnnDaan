@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 const openrouter = new OpenAI({
@@ -10,7 +11,7 @@ function convertTo24Hour(time, period) {
        let [hours, minutes] = time.split(":").map(Number);
        if (period === "PM" && hours !== 12) hours += 12;
        if (period === "AM" && hours === 12) hours = 0;
-       return { hours, minutes };
+       return {hours, minutes};
 }
 
 
@@ -31,20 +32,20 @@ function getSafeLimit(foodType, storedInFridge, food) {
 
 function getSafetyStatus(hoursPassed, safeLimit) {
        if (hoursPassed > safeLimit) {
-              return { status: "Unsafe ❌", color: "red" };
+              return { status: "Unsafe", color: "red" };
        } else if (hoursPassed > safeLimit - 2) {
-              return { status: "Donate Immediately ⚠️", color: "yellow" };
+              return { status: "Donate Immediately", color: "yellow" };
        } else {
-              return { status: "Safe ✅", color: "green" };
+              return { status: "Safe", color: "green" };
        }
 }
 
 export async function POST(req) {
        try {
-              const {food,date,time,foodType,storedInFridge = false} = await req.json();
+              const {food,date, period,time,foodType,storedInFridge = false} = await req.json();
 
               if (!food || !date || !time || !foodType || !period) {
-                     return Response.json({ error: "Missing fields" }, { status: 400 });
+                     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
               }
 
               const { hours, minutes } = convertTo24Hour(time, period);
@@ -54,7 +55,7 @@ export async function POST(req) {
               const currentDate = new Date();
 
               if (cookedDateTime > currentDate) {
-                     return Response.json({ error: "Future time not allowed" });
+                     return NextResponse.json({ error: "Future time not allowed" });
               }
 
               const hoursPassed = (currentDate - cookedDateTime) / (1000 * 60 * 60);
@@ -68,9 +69,9 @@ export async function POST(req) {
 
               const safety = getSafetyStatus(hoursPassed, safeLimit);
 
-              // ❌ HARD BLOCK (no AI)
+              //  HARD BLOCK (no AI)
               if (hoursPassed > safeLimit + 2) {
-                     return Response.json({
+                     return NextResponse.json({
                             expiry: expiryDate.toLocaleString(),
                             note: "Do not donate or consume",
                             status: "Rejected ❌",
@@ -111,7 +112,7 @@ export async function POST(req) {
 
               const safetyScore = Math.max(0,Math.min(100, 100 - (hoursPassed / safeLimit) * 100));
 
-              return Response.json({
+              return NextResponse.json({
                      expiry: expiryDate.toLocaleString(),
                      note: aiNote,
                      status: safety.status,
@@ -120,7 +121,7 @@ export async function POST(req) {
               });
        } catch (err) {
               console.log(err);
-              return Response.json({
+              return NextResponse.json({
                      expiry: "Unknown",
                      note: "Error occurred",
                      status: "Error",

@@ -13,13 +13,11 @@ const DonationSchema = new mongoose.Schema(
                      required: true,
                      trim: true,
               },
-
               foodType: {
                      type: String,
                      enum: ["veg", "non-veg"],
                      required: true,
               },
-
               quantity: {
                      type: String,
                      required: true,
@@ -72,8 +70,14 @@ const DonationSchema = new mongoose.Schema(
 
               status: {
                      type: String,
-                     enum: ["Pending", "Accepted", "Picked", "Rejected"],
+                     enum: ["Pending", "Accepted", "Picked"],
                      default: "Pending",
+              },
+
+              foodStatus:{
+                     type:String,
+                     enum: ["Safe", "Unsafe", "Moderate"],
+                     default:null
               },
 
               color: {
