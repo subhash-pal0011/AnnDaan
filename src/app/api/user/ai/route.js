@@ -73,8 +73,8 @@ export async function POST(req) {
               if (hoursPassed > safeLimit + 2) {
                      return NextResponse.json({
                             expiry: expiryDate.toLocaleString(),
-                            note: "Do not donate or consume",
-                            status: "Rejected ❌",
+                            note: "This food is unsafe and should not be donated or consumed.",
+                            status: "Unsafe",
                             color: "red",
                             safetyScore: 0,
                      });
