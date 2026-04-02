@@ -2,13 +2,14 @@
 import { useRouter } from "next/navigation";
 import React from "react";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 
 const MainPage = () => {
        const router = useRouter()
-
+       const session = useSession()
+       const role = session?.data?.user?.role
        return (
               <div className="w-full min-h-screen bg-gray-50">
-
                      <section className="relative bg-linear-to-b from-blue-200 to-orange-100 text-center">
                             <img
                                    src="/fistSectionImg.png"
@@ -49,17 +50,20 @@ const MainPage = () => {
                                           transition={{ delay: 0.4, duration: 0.6 }}
                                           className="flex flex-col md:flex-row gap-4 mt-6"
                                    >
-                                          <button
-                                                 onClick={() => router.push("/myDonations")}
-                                                 className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold flex gap-1 items-center cursor-pointer"
-                                          >
-                                                 Donate Food
-                                                 <img src="/rightArrow.gif" className="h-7" />
-                                          </button>
-
-                                          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
-                                                 Join as NGO
-                                          </button>
+                                          {role === "organizer" ?
+                                                 <button
+                                                        onClick={() => router.push("/myDonations")}
+                                                        className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold flex gap-1 items-center cursor-pointer"
+                                                 >
+                                                        Donate Food
+                                                        <img src="/rightArrow.gif" className="h-7"/>
+                                                 </button>
+                                                 :
+                                                 <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold flex items-center gap-1 cursor-pointer">
+                                                        Join as NGO
+                                                        <img src="/rightArrow.gif" className="h-7" />
+                                                 </button>
+                                          }
                                    </motion.div>
 
                             </motion.div>
@@ -115,7 +119,7 @@ const MainPage = () => {
                                           className="bg-white p-6 rounded-xl shadow hover:shadow-xl"
                                    >
                                           <div className="text-green-600 font-bold text-xl">2. NGO Accept</div>
-                                          <img src="/NGOAccept.png" className="h-30 mx-auto" />
+                                          <img src="/handshake_transparent_v2.png" className="h-30 mx-auto" />
                                           <p className="text-gray-500 text-sm">
                                                  NGO picks up the food.
                                           </p>
@@ -131,7 +135,7 @@ const MainPage = () => {
                                           className="bg-white p-6 rounded-xl shadow hover:shadow-xl"
                                    >
                                           <div className="text-green-600 font-bold text-xl">3. Distribute</div>
-                                          <img src="/distrubute.png" className="h-30 mx-auto" />
+                                          <img src="/text_transparent.png" className="h-30 mx-auto" />
                                           <p className="text-gray-500 text-sm">
                                                  Food delivered to those in need.
                                           </p>
