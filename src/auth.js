@@ -5,7 +5,6 @@ import connectDb from "./db/connectDb";
 import User from "./model/user";
 import Google from "next-auth/providers/google";
 
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
        providers: [
               Credentials({
@@ -15,17 +14,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             password: { label: "Password", type: "password" },
                      },
                      async authorize(credentials) {
-                            await connectDb()
+                            await connectDb();
 
                             const email = credentials?.email;
                             const password = credentials?.password;
 
-                            console.log("email :", email)
                             if (!email || !password) {
                                    throw new Error("Email and password are required");
                             }
 
                             const user = await User.findOne({ email });
+
                             if (!user) {
                                    throw new Error("No user found with this email");
                             }
@@ -35,6 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             }
 
                             const isMatchPass = await bcrypt.compare(password, user.password);
+
                             if (!isMatchPass) {
                                    throw new Error("Invalid password");
                             }
@@ -47,10 +47,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             };
                      },
               }),
+
               Google({
                      clientId: process.env.GOOGLE_CLIENT_ID,
-                     clientSecret: process.env.GOOGLE_CLIENT_SECRET
-              })
+                     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+              }),
        ],
 
        callbacks: {
@@ -58,6 +59,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                      if (account?.provider === "google") {
                             try {
                                    await connectDb();
+
                                    let existingUser = await User.findOne({ email: user.email });
 
                                    if (!existingUser) {
@@ -67,10 +69,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                                  isVerified: true,
                                                  provider: "google",
                                                  role: "organizer",
+                                                 location: {
+                                                        type: "Point",
+                                                        coordinates: [0, 0],
+                                                 },
                                           });
                                    }
+
                                    user.id = existingUser._id.toString();
                                    user.role = existingUser.role;
+
                                    return true;
                             } catch (error) {
                                    console.error("Google SignIn Error:", error);
@@ -80,32 +88,42 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                      return true;
               },
+
               async jwt({ token, user }) {
-                     await connectDb()
+                     await connectDb();
                      if (user) {
                             token.id = user.id;
                             token.name = user.name;
                             token.email = user.email;
                             token.role = user.role;
                      }
+
                      try {
                             if (token?.id) {
-                                   const dbUser = await User.findById(token.id);
+                                   const dbUser = await User.findById(token.id).lean();
+
                                    if (dbUser) {
-                                          token.role = dbUser.role; 
+                                          token.role = dbUser.role;
+
+                                          //  only boolean (safe for JWT) kyuki hume ye pata krna ki user ke locatrion mea lat ,lng save hua ya nhi.
+                                          token.hasLocation = dbUser.location?.coordinates?.[0] !== 0;
+                                                 
                                    }
                             }
                      } catch (error) {
                             console.error("JWT DB Sync Error:", error);
                      }
+
                      return token;
               },
+
               async session({ session, token }) {
                      if (token) {
                             session.user.id = token.id;
                             session.user.name = token.name;
                             session.user.email = token.email;
                             session.user.role = token.role;
+                            session.user.hasLocation = token.hasLocation;
                      }
                      return session;
               },
@@ -122,4 +140,3 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
        secret: process.env.AUTH_SECRET,
 });
-
