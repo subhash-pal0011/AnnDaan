@@ -66,7 +66,7 @@ const MainPage = () => {
                                                                <img src="/rightArrow.gif" className="h-7" />
                                                         </button>
 
-                                                        {!userLocation && <button className=" bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold flex items-center gap-1 cursor-pointer transition-all duration-300">
+                                                        {!userLocation && <button onClick={()=>router.push("/get-location")} className=" bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold flex items-center gap-1 cursor-pointer transition-all duration-300">
                                                                Get Location
                                                                <img src="/rightArrow.gif" className="h-7" />
                                                         </button>}
