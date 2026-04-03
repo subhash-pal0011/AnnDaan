@@ -8,7 +8,7 @@ export async function POST(req) {
        try {
               await connectDb();
 
-              const { name, email, password } = await req.json();
+              const { name, email, password, location } = await req.json();
 
               if (!name || !email || !password) {
                      return NextResponse.json(
@@ -37,7 +37,8 @@ export async function POST(req) {
                      password: hashedPassword,
                      otp,
                      otpExp,
-                     isVerified: false
+                     isVerified: false,
+                     location,
               });
 
               const userResponse = {
