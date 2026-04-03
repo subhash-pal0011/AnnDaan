@@ -13,17 +13,33 @@ const DonationSchema = new mongoose.Schema(
                      required: true,
                      trim: true,
               },
+
               foodType: {
                      type: String,
                      enum: ["veg", "non-veg"],
                      required: true,
               },
+
               quantity: {
                      type: String,
                      required: true,
               },
 
+              // ✅ GEO LOCATION (for distance search a NGO)
               location: {
+                     type: {
+                            type: String,
+                            enum: ["Point"],
+                            required: true,
+                     },
+                     coordinates: {
+                            type: [Number],
+                            required: true,
+                     },
+              },
+
+              // ✅  ISSE  JO DONATE FOOD USER RHEGA JB O APNA DONATE FOOD DEKHEGA TO USE YE ADDRESS KA USE HOGA .
+              address: {
                      type: String,
                      required: true,
               },
@@ -31,6 +47,7 @@ const DonationSchema = new mongoose.Schema(
               city: {
                      type: String,
                      trim: true,
+                     index: true, // ISSE FAST SURCHING KE LIYE USE
               },
 
               state: {
@@ -41,11 +58,13 @@ const DonationSchema = new mongoose.Schema(
               pinCode: {
                      type: String,
                      trim: true,
+                     index: true,
               },
 
               date: {
                      type: Date,
                      required: true,
+                     index: true,
               },
 
               time: {
@@ -72,12 +91,13 @@ const DonationSchema = new mongoose.Schema(
                      type: String,
                      enum: ["Pending", "Accepted", "Picked"],
                      default: "Pending",
+                     index: true,
               },
 
-              foodStatus:{
-                     type:String,
+              foodStatus: {
+                     type: String,
                      enum: ["Safe", "Unsafe", "Moderate"],
-                     default:null
+                     default: null,
               },
 
               color: {
@@ -99,6 +119,7 @@ const DonationSchema = new mongoose.Schema(
        { timestamps: true }
 );
 
-const Donation = mongoose.models.Donation || mongoose.model("Donation", DonationSchema);
+DonationSchema.index({ location: "2dsphere" });
 
+const Donation = mongoose.models.Donation || mongoose.model("Donation", DonationSchema);
 export default Donation;
