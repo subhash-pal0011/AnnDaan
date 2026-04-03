@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 const MainPage = () => {
        const router = useRouter()
        const session = useSession()
+       const userLocation = session?.data?.user?.hasLocation
        const role = session?.data?.user?.role
        return (
               <div className="w-full min-h-screen bg-gray-50">
@@ -56,13 +57,21 @@ const MainPage = () => {
                                                         className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold flex gap-1 items-center cursor-pointer"
                                                  >
                                                         Donate Food
-                                                        <img src="/rightArrow.gif" className="h-7"/>
-                                                 </button>
-                                                 :
-                                                 <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold flex items-center gap-1 cursor-pointer">
-                                                        Join as NGO
                                                         <img src="/rightArrow.gif" className="h-7" />
                                                  </button>
+                                                 :
+                                                 <div className="flex flex-wrap items-center gap-1">
+                                                        <button onClick={() => router.push("/ngo/ngoNotification")} className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold flex items-center gap-1 cursor-pointer transition-all duration-300">
+                                                               Join as NGO
+                                                               <img src="/rightArrow.gif" className="h-7" />
+                                                        </button>
+
+                                                        {!userLocation && <button className=" bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold flex items-center gap-1 cursor-pointer transition-all duration-300">
+                                                               Get Location
+                                                               <img src="/rightArrow.gif" className="h-7" />
+                                                        </button>}
+
+                                                 </div>
                                           }
                                    </motion.div>
 
