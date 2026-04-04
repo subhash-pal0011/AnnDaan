@@ -3,6 +3,7 @@ import connectDb from "@/db/connectDb";
 import User from "@/model/user";
 import Notification from "@/model/notification";
 import { NextResponse } from "next/server";
+import Donation from "@/model/donation";
 
 export async function GET() {
        try {
