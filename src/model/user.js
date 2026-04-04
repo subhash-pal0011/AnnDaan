@@ -78,6 +78,16 @@ const userSchema = new mongoose.Schema(
               lastLogin: {
                      type: Date,
               },
+
+              socketId:{
+                     type:String,
+                     default:null
+              },
+
+              isOnline:{
+                     type:Boolean,
+                     default:false
+              }
        },
        { timestamps: true }
 );
