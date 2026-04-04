@@ -25,7 +25,7 @@ const DonationSchema = new mongoose.Schema(
                      required: true,
               },
 
-              // ✅ GEO LOCATION (for distance search a NGO)
+              // GEO LOCATION (for distance search a NGO)
               location: {
                      type: {
                             type: String,
@@ -38,7 +38,7 @@ const DonationSchema = new mongoose.Schema(
                      },
               },
 
-              // ✅  ISSE  JO DONATE FOOD USER RHEGA JB O APNA DONATE FOOD DEKHEGA TO USE YE ADDRESS KA USE HOGA .
+              //  ISSE  JO DONATE FOOD USER RHEGA JB O APNA DONATE FOOD DEKHEGA TO USE YE ADDRESS KA USE HOGA .
               address: {
                      type: String,
                      required: true,
@@ -96,7 +96,7 @@ const DonationSchema = new mongoose.Schema(
 
               foodStatus: {
                      type: String,
-                     enum: ["Safe", "Unsafe", "Moderate"],
+                     enum: ["Safe", "Unsafe", "Donate Immediately"],
                      default: null,
               },
 
