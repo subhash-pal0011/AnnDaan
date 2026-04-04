@@ -3,45 +3,29 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const Page = () => {
 
        const [active, setActive] = useState("active");
-       const router = useRouter()
-
-       const data = [
-              {
-                     id: 1,
-                     food: "Veg Biryani",
-                     location: "Lucknow",
-                     time: "5:00 PM",
-                     status: "pending",
-              },
-              {
-                     id: 2,
-                     food: "Paneer Butter Masala",
-                     location: "Delhi",
-                     time: "2:00 PM",
-                     status: "accepted",
-              },
-              {
-                     id: 3,
-                     food: "Dal & Rice",
-                     location: "Kanpur",
-                     time: "Yesterday",
-                     status: "completed",
-              },
-              {
-                     id: 4,
-                     food: "Chapati & Sabzi",
-                     location: "Noida",
-                     time: "Today",
-                     status: "pending",
-              },
-       ]
+       const [donations, setDonations] = useState([]);
 
 
+       const getDonateFood = async () => {
+              try {
+                     const res = await axios.get("/api/user/getDonateFood");
+                     if (res.data.success) {
+                            console.log(res.data.data);
+                            setDonations(res.data?.data)
+                     }
+              } catch (error) {
+                     console.log("Fetch error:", error);
+              }
+       };
+
+       useEffect(() => {
+              getDonateFood()
+       }, [])
        return (
               <div className="w-full min-h-screen bg-gray-100">
 
@@ -96,7 +80,6 @@ const Page = () => {
 
 
                      <div className="md:px-3 px-2">
-                            {/* Container */}
                             <div className="bg-white/40 backdrop-blur-md shadow-lg rounded-xl md:px-5 px-2">
 
                                    <div className="py-5 text-center space-x-5">
@@ -120,23 +103,46 @@ const Page = () => {
                                    </div>
 
                                    <div className="space-y-5">
-                                          {data.map((item) => (
+                                          {donations?.map((item) => (
                                                  <motion.div
-                                                        key={item.id}
+                                                        key={item?._id}
                                                         whileHover={{ scale: 1.03 }}
                                                         initial={{ opacity: 0, y: 20 }}
                                                         animate={{ opacity: 1, y: 0 }}
-                                                        className="bg-white p-5 rounded-xl shadow-md hover:shadow-xl transition space-y-4"
+                                                        className="bg-white px-8 p-4 rounded-xl shadow-md hover:shadow-xl transition space-y-2"
                                                  >
                                                         {/* Food */}
-                                                        <h2 className="text-lg font-semibold text-gray-800">
-                                                               🍱 {item.food}
-                                                        </h2>
+                                                        <div className="flex items-center md:gap-1.5 flex-wrap">
+                                                               <img src="/food-1.gif" className="h-10" />
+                                                               <p className="text-2xl font-bold text-gray-700 mt-3">{item.food}</p>
+                                                               <p className="text-xs mt-3 text-gray-700">
+                                                                      {new Date(item.createdAt).toLocaleString()}
+                                                               </p>
+                                                        </div>
 
                                                         {/* Info */}
-                                                        <div className="text-sm text-gray-500 space-y-1">
-                                                               <p>📍 {item.location}</p>
-                                                               <p>⏰ {item.time}</p>
+                                                        <div className="space-y-1.5 mt-2">
+                                                               {/* Left Side */}
+                                                               <div className="text-sm text-gray-500 space-y-1">
+                                                                      <p>{item.address}</p>
+
+                                                                      <div className="flex gap-1">
+                                                                             <span>Prepared Time:</span>
+                                                                             <span>{item.time}</span>
+                                                                      </div>
+                                                               </div>
+
+                                                               {/* Right Side */}
+                                                               <div className="flex gap-1 text-sm text-gray-500">
+                                                                      <span>Expiry Date:</span>
+                                                                      <span>{item.expiry}</span>
+                                                               </div>
+                                                        </div>
+
+                                                        <div className="flex gap-1 text-sm text-gray-500">
+                                                               <p>Food Type :</p> <p>{item.foodType}</p>,
+                                                               <p>Quantity :</p> <p>{item.quantity}</p>
+
                                                         </div>
 
                                                         {/* Footer */}
@@ -156,14 +162,10 @@ const Page = () => {
 
                                                                {/* Actions */}
                                                                {item.status !== "completed" && (
-                                                                      <div className="flex gap-2">
-                                                                             <button className="text-sm px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-                                                                                    Edit
-                                                                             </button>
-                                                                             <button className="text-sm px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">
-                                                                                    Delete
-                                                                             </button>
-                                                                      </div>
+                                                                      <button className="text-sm px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition cursor-pointer flex">
+                                                                             <img src="/deleteIcon.gif" className="h-6 items-center text-center" />
+                                                                             Delete
+                                                                      </button>
                                                                )}
                                                         </div>
                                                  </motion.div>
