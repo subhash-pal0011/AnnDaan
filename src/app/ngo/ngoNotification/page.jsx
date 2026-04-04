@@ -15,7 +15,7 @@ const Page = () => {
               try {
                      const res = await axios.get("/api/ngo/getNotification");
                      if (res.data.success) {
-                            setNotifications(res.data.data);
+                            setNotifications(res.data.data)
                             console.log("Notifications:", res.data.data);
                      }
               } catch (error) {
@@ -112,16 +112,26 @@ const Page = () => {
                                                                       </p>
                                                                </div>
 
+                                                               {/* Donor Info */}
+                                                               <p className="text-sm text-gray-700 mt-2">
+                                                                      👤 {item.donationUserId?.name || "Unknown"}
+                                                               </p>
+
+                                                               <p className="text-sm text-gray-700 mt-1.5">
+                                                                      📞 {item.donationUserId?.phone || "No phone available"}
+                                                               </p>
+
+                                                               {/* Full Address */}
+                                                               <p className="text-sm text-gray-600 mt-2 flex  flex-wrap">
+                                                                      📍 {item.foodId?.address}, {item.foodId?.city}, {item.foodId?.state} - {item.foodId?.pinCode}
+                                                               </p>
+
                                                                {/* 📦 Quantity */}
                                                                <p className="text-sm text-gray-700 font-medium mb-2">
                                                                       📦 {item.foodId?.quantity || "-"}
                                                                </p>
 
-                                                               {/* 📍 Location */}
-                                                               <div className="text-sm text-gray-600 space-y-1">
-                                                                      <p>📍 {item.foodId?.location?.name || "-"}, {item.foodId?.city || "-"}</p>
-                                                                      <p>🗺️ {item.foodId?.state || "-"} - {item.foodId?.pinCode || "-"}</p>
-                                                               </div>
+                                                              
 
                                                                {/* ⏰ Time + Expiry */}
                                                                <div className="flex md:flex-row flex-col justify-between text-sm text-gray-500 mt-2">
