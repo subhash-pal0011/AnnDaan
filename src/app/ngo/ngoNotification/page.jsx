@@ -96,7 +96,7 @@ const Page = () => {
                                           </button>
                                    </div>
                             ) : (
-                                   /* Cards */
+                                   //  Cards 
                                    <motion.div
                                           className="grid gap-6 max-w-lg mx-auto"
                                           initial={{ opacity: 0 }}
