@@ -34,14 +34,6 @@ const Navbar = () => {
                                    </span>
                             )}
 
-                            <button
-                                   onClick={() => router.push("/get-location")}
-                                   className="flex items-center gap-2 text-gray-500 hover:bg-blue-600 font-semibold text-xs sm:text-sm md:text-base hover:text-white p-2 sm:px-3 sm:py-2 md:px-4 md:py-2 rounded-lg shadow-md transition-all duration-300 cursor-pointer w-full sm:w-auto justify-center"
-                            >
-                                   <img src="/location.gif" className="h-4 sm:h-5 md:h-6" />
-                                   <span className="truncate">Change Location</span>
-                            </button>
-
                             <div className="relative group">
                                    <div className="w-10 h-10 rounded-full overflow-hidden border shadow-sm cursor-pointer">
                                           {img ? (
