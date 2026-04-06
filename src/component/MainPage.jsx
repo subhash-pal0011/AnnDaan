@@ -7,8 +7,8 @@ import { useSession } from "next-auth/react";
 const MainPage = () => {
        const router = useRouter()
        const session = useSession()
-       const userLocation = session?.data?.user?.hasLocation
        const role = session?.data?.user?.role
+
        return (
               <div className="w-full min-h-screen bg-gray-50">
                      <section className="relative bg-linear-to-b from-blue-200 to-orange-100 text-center">
@@ -65,11 +65,6 @@ const MainPage = () => {
                                                                Join as NGO
                                                                <img src="/rightArrow.gif" className="h-7" />
                                                         </button>
-
-                                                        {!userLocation && <button onClick={()=>router.push("/get-location")} className=" bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold flex items-center gap-1 cursor-pointer transition-all duration-300">
-                                                               Get Location
-                                                               <img src="/rightArrow.gif" className="h-7" />
-                                                        </button>}
 
                                                  </div>
                                           }
