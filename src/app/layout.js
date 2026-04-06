@@ -2,6 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner"
 import Provider from "@/provider";
+import StoreProvider from "@/redux/StoreProvider";
+import AppInit from "@/AppInit";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,11 +27,19 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        
+
         <Provider>
 
-          {children}
-          
+          <StoreProvider>
+
+            <AppInit>
+
+              {children}
+
+            </AppInit>
+
+          </StoreProvider>
+
         </Provider>
 
         <Toaster />
