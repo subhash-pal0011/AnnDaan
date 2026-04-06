@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { socketConnection } from "@/lib/socketConnection";
 
 const Page = () => {
        const [notifications, setNotifications] = useState([]);
@@ -16,7 +17,7 @@ const Page = () => {
                      const res = await axios.get("/api/ngo/getNotification");
                      if (res.data.success) {
                             setNotifications(res.data.data)
-                            console.log("Notifications:", res.data.data);
+                            // console.log("Notifications:", res.data.data);
                      }
               } catch (error) {
                      console.log("Get notification error:", error);
@@ -24,7 +25,6 @@ const Page = () => {
                      setLoading(false);
               }
        };
-
        useEffect(() => {
               getNotification();
        }, []);
@@ -35,6 +35,16 @@ const Page = () => {
               );
               setNotifications(updated);
        };
+
+       useEffect(() => {
+              const socket = socketConnection()
+              socket.on("new-food", (newDonation) => {
+                     setNotifications(prev => [newDonation, ...prev])
+              })
+              return () => {
+                     socket.off("new-food")
+              }
+       }, [])
 
        return (
               <div className="min-h-screen bg-linear-to-b from-blue-50 to-gray-100">
@@ -131,7 +141,7 @@ const Page = () => {
                                                                       📦 {item.foodId?.quantity || "-"}
                                                                </p>
 
-                                                              
+
 
                                                                {/* ⏰ Time + Expiry */}
                                                                <div className="flex md:flex-row flex-col justify-between text-sm text-gray-500 mt-2">
