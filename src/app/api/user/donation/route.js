@@ -4,13 +4,14 @@ import Donation from "@/model/donation";
 import User from "@/model/user";
 import connectDb from "@/db/connectDb";
 import Notification from "@/model/notification";
+import eventHandler from "@/lib/eventHandler";
 
 export async function POST(req) {
        try {
               await connectDb();
 
               const session = await auth();
-              if (!session?.user) {
+              if (!session?.user?.id) {
                      return NextResponse.json(
                             { success: false, message: "Unauthorized" },
                             { status: 401 }
@@ -18,6 +19,7 @@ export async function POST(req) {
               }
 
               const body = await req.json();
+
               const {
                      food,
                      foodType,
@@ -43,7 +45,9 @@ export async function POST(req) {
                      !foodType ||
                      !quantity ||
                      !location ||
-                     !location.coordinates ||
+                     location.type !== "Point" ||
+                     !Array.isArray(location.coordinates) ||
+                     location.coordinates.length !== 2 ||
                      !address ||
                      !date ||
                      !time ||
@@ -52,7 +56,16 @@ export async function POST(req) {
                      !foodStatus
               ) {
                      return NextResponse.json(
-                            { success: false, message: "Something is missing" },
+                            { success: false, message: "Invalid or missing fields" },
+                            { status: 400 }
+                     );
+              }
+
+              const [lng, lat] = location.coordinates;
+
+              if (typeof lng !== "number" || typeof lat !== "number") {
+                     return NextResponse.json(
+                            { success: false, message: "Invalid coordinates" },
                             { status: 400 }
                      );
               }
@@ -62,7 +75,10 @@ export async function POST(req) {
                      food,
                      foodType,
                      quantity,
-                     location,
+                     location: {
+                            type: "Point",
+                            coordinates: [lng, lat],
+                     },
                      address,
                      city,
                      state,
@@ -78,46 +94,120 @@ export async function POST(req) {
                      notes,
               });
 
-              //  Find nearby NGOs within 5km
-              const [foodLng, foodLat] = location.coordinates;
-              const nearbyNgos = await User.find({
-                     role: "ngo",
-                     location: {
-                            $near: {
-                                   $geometry: { type: "Point", coordinates: [foodLng, foodLat] },
-                                   $maxDistance: 5000,
+              // REALTIME>>>
+              // HUM DIRECT BHI DATA:NEWdONATION KR STE HII BUT ITS BEST
+              await eventHandler({ 
+                     eventName: "new-food",
+                     data: {
+                            _id: newDonation._id,
+
+                            foodId: {
+                                   ...newDonation._doc 
                             },
-                     },
+
+                            donationUserId: {
+                                   _id: session.user.id,
+                                   name: session.user.name,
+                                   phone: session.user.phone
+                            },
+
+                            ngoStatus: "assigned",
+                            createdAt: new Date()
+                     }
+              })
+
+
+              let nearbyNgos = [];
+              const radiusList = [5000, 10000, 20000];
+
+              for (let radius of radiusList) {
+                     const ngos = await User.find({
+                            role: "ngo",
+                            location: {
+                                   $near: {
+                                          $geometry: {
+                                                 type: "Point",
+                                                 coordinates: [lng, lat],
+                                          },
+                                          $maxDistance: radius,
+                                   },
+                            },
+                     }).select("_id");
+
+                     if (ngos.length > 0) {
+                            nearbyNgos = ngos;
+                            break;
+                     }
+              }
+
+              // No NGO found
+              if (nearbyNgos.length === 0) {
+                     return NextResponse.json(
+                            {
+                                   success: true,
+                                   message: "Donation saved 👍. No NGOs nearby right now.",
+                                   data: newDonation,
+                                   notifiedNgos: 0,
+                            },
+                            { status: 201 }
+                     );
+              }
+
+              // FIND KR RHE HII JO BUSY HII  ( busy mtlb jinka status === ["accepted", "out_for_delivery"] ye ho isse FIND KR LENGE).
+              const busyNgos = await Notification.distinct("ngoUserId", {
+                     ngoStatus: { $in: ["accepted", "out_for_delivery"] },
               });
 
+              // FIND JO BUSY NGO NHI HII
+              const availableNgos = nearbyNgos.filter((ngo) =>
+                     !busyNgos.includes(ngo._id.toString())
+              );
 
-              const notifications = [];
-              for (const ngo of nearbyNgos) {
-                     notifications.push({
-                            foodId: newDonation._id,           // Link to donation
-                            donationUserId: session.user.id,   // Donor
-                            ngoUserId: ngo._id,                // NGO
-                            ngoStatus: "assigned",
-                            isNotified: true,
-                     });
+              // KOI NGO NHI MILA TO.
+              if (availableNgos.length === 0) {
+                     return NextResponse.json(
+                            {
+                                   success: true,
+                                   message: "All nearby NGOs are busy 😕. Please wait.",
+                                   data: newDonation,
+                                   totalNearby: nearbyNgos.length,
+                                   busyNgos: busyNgos.length,
+                                   notifiedNgos: 0,
+                            },
+                            { status: 201 }
+                     );
               }
 
-              if (notifications.length > 0) {
-                     await Notification.insertMany(notifications);
-              }
+              const notifications = availableNgos.map((ngo) => ({
+                     foodId: newDonation._id,
+                     donationUserId: session.user.id,
+                     ngoUserId: ngo._id,
+                     ngoStatus: "assigned",
+                     isNotified: true,
+              }));
+
+              await Notification.insertMany(notifications);
 
               return NextResponse.json(
                      {
                             success: true,
-                            message: "Donation created & NGOs notified 🚀",
+                            message: "Donation created & NGOs notified",
                             data: newDonation,
+                            totalNearby: nearbyNgos.length,
+                            busyNgos: busyNgos.length,
+                            notifiedNgos: notifications.length,
                      },
                      { status: 201 }
               );
+
        } catch (error) {
-              console.log("Donation API Error:", error);
+              console.error("Donation API Error:", error);
               return NextResponse.json(
-                     { success: false, message: error.message },
+                     {
+                            success: false,
+                            message: "Internal Server Error",
+                            error: error.message,
+                     },
                      { status: 500 }
               );
        }
