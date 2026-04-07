@@ -104,12 +104,12 @@ const Page = () => {
 
                                    <div className="space-y-5">
                                           {donations?.map((item) => (
-                                                 <motion.div
+                                                 < motion.div
                                                         key={item?._id}
                                                         whileHover={{ scale: 1.03 }}
                                                         initial={{ opacity: 0, y: 20 }}
                                                         animate={{ opacity: 1, y: 0 }}
-                                                        className="bg-white px-8 p-4 rounded-xl shadow-md hover:shadow-xl transition space-y-2"
+                                                        className="bg-white md:px-8 px-1 p-4 rounded shadow-md hover:shadow-xl transition space-y-2"
                                                  >
                                                         {/* Food */}
                                                         <div className="flex items-center md:gap-1.5 flex-wrap">
@@ -150,11 +150,13 @@ const Page = () => {
 
                                                                {/* Status */}
                                                                <span
-                                                                      className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${item.status === "pending"
+                                                                      className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${item.status === "Pending"
                                                                              ? "bg-yellow-100 text-yellow-600"
-                                                                             : item.status === "accepted"
+                                                                             : item.status === "Accepted"
                                                                                     ? "bg-blue-100 text-blue-600"
-                                                                                    : "bg-green-100 text-green-600"
+                                                                                    : item.status === "Picked"
+                                                                                           ? "bg-green-100 text-green-600"
+                                                                                           : "bg-gray-100 text-gray-600"
                                                                              }`}
                                                                >
                                                                       {item.status}
@@ -168,12 +170,50 @@ const Page = () => {
                                                                       </button>
                                                                )}
                                                         </div>
+
+                                                        {item.acceptedBy && (
+                                                               <div className="mt-3 bg-linear-to-r from-blue-50 to-blue-100  rounded p-3 shadow-sm hover:shadow-md transition-all duration-300">
+
+                                                                      {/* Header */}
+                                                                      <div className="flex items-center gap-2 mb-2">
+                                                                             <img src="/connect.png" className="h-6" />
+                                                                             <p className="text-xs font-semibold text-blue-700">
+                                                                                    NGO Assigned
+                                                                             </p>
+                                                                      </div>
+
+                                                                      {/* NGO Details */}
+                                                                      <div className="space-y-1 text-sm text-gray-700">
+                                                                             <p className="flex items-center gap-2">
+                                                                                    👤 <span className="font-medium">{item.acceptedBy?.name}</span>
+                                                                             </p>
+                                                                             <div className="flex justify-between">
+                                                                                    <p className="flex items-center gap-2">
+                                                                                           📞 <span>{item.acceptedBy?.phone}</span>
+                                                                                    </p>
+
+                                                                                    <a
+                                                                                           href={`tel:${item.acceptedBy?.phone}`}
+                                                                                           className="flex items-center text-gray-600 justify-center gap-2  mt-3 px-4 py-2 rounded-xl  bg-linear-to-r from-green-500 to-emerald-600 text-sm font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-200"
+                                                                                    >
+                                                                                           📞 Call NGO
+                                                                                    </a>
+                                                                             </div>
+
+                                                                      </div>
+
+                                                                      {/* Status Line */}
+                                                                      <div className="mt-2 text-[11px] text-green-600 font-medium">
+                                                                             ✅ NGO will pick up your food soon
+                                                                      </div>
+                                                               </div>
+                                                        )}
                                                  </motion.div>
                                           ))}
                                    </div>
                             </div>
                      </div>
-              </div>
+              </div >
        );
 };
 export default Page;
