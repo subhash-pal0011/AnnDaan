@@ -94,6 +94,13 @@ const DonationSchema = new mongoose.Schema(
                      index: true,
               },
 
+              // isse  GET DONATION FOOD MEA JO NGO VALE NE ACCEPT KIYA HII USE NGO KA DETAIL SE DIKHEGA.
+              acceptedBy: {
+                     type: mongoose.Schema.Types.ObjectId,
+                     ref: "User",
+                     default: null,
+              },
+
               foodStatus: {
                      type: String,
                      enum: ["Safe", "Unsafe", "Donate Immediately"],
