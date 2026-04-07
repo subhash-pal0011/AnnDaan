@@ -17,7 +17,7 @@ export async function GET() {
 
               const userId = session.user.id;
 
-              const donations = await Donation.find({ user: userId }).populate("user")
+              const donations = await Donation.find({ user: userId }).populate("user").populate("acceptedBy")
                      .sort({ createdAt: -1 });
 
               return NextResponse.json({
