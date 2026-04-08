@@ -6,6 +6,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { socketConnection } from "@/lib/socketConnection";
+import { toast } from "sonner";
 
 const Page = () => {
        const [notifications, setNotifications] = useState([]);
@@ -17,7 +18,6 @@ const Page = () => {
                      const res = await axios.get("/api/ngo/getNotification");
                      if (res.data.success) {
                             setNotifications(res.data.data)
-                            // console.log("Notifications:", res.data.data);
                      }
               } catch (error) {
                      console.log("Get notification error:", error);
@@ -29,22 +29,48 @@ const Page = () => {
               getNotification();
        }, []);
 
-       const handleAction = (id, action) => {
-              const updated = notifications.map((item) =>
-                     item._id === id ? { ...item, status: action } : item
-              );
-              setNotifications(updated);
-       };
-
+       
        useEffect(() => {
-              const socket = socketConnection()
-              socket.on("new-food", (newDonation) => {
-                     setNotifications(prev => [newDonation, ...prev])
-              })
-              return () => {
-                     socket.off("new-food")
+              const socket = socketConnection();
+
+              socket.on("new-food", (data) => {
+                     setNotifications(prev => {
+
+                            const isBusy = prev.some(
+                                   item => item.ngoStatus === "accepted" || item.ngoStatus === "out_for_delivery"
+                            );
+
+                            if (isBusy) return prev;
+
+                            const exists = prev.find(item => item._id === data._id);
+                            if (exists) return prev;
+
+                            return [data, ...prev];
+                     });
+              });
+
+              return () => socket.off("new-food");
+       }, []);
+
+
+       const accept = async (foodId) => {
+              try {
+                     const res = await axios.post(
+                            `/api/ngo/notification/${foodId}/acceptNotification`
+                     );
+
+                     if (res.data.success) {
+                            toast.success(res.data.message);
+
+                            // UI update (optional)
+                            setNotifications(prev =>
+                                   prev.filter(item => item._id === foodId)
+                            );
+                     }
+              } catch (error) {
+                     console.log("accept error:", error.response?.data);
               }
-       }, [])
+       };
 
        return (
               <div className="min-h-screen bg-linear-to-b from-blue-50 to-gray-100">
@@ -104,6 +130,7 @@ const Page = () => {
                                    >
                                           {notifications.length > 0 ? (
                                                  notifications.map((item) => (
+
                                                         <motion.div
                                                                key={item._id}
                                                                initial={{ opacity: 0, y: 40 }}
@@ -158,7 +185,7 @@ const Page = () => {
                                                                {item.ngoStatus === "assigned" ? (
                                                                       <div className="flex gap-3 mt-5">
                                                                              <button
-                                                                                    onClick={() => handleAction(item._id, "accepted")}
+                                                                                    onClick={() => accept(item?._id)}
                                                                                     className="flex-1 bg-green-500 text-white py-2 rounded-lg cursor-pointer hover:bg-green-600 transition font-medium"
                                                                              >
                                                                                     Accept
@@ -206,3 +233,4 @@ const Page = () => {
 };
 
 export default Page;
+
