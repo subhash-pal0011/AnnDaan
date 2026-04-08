@@ -194,7 +194,7 @@ const Page = () => {
 
                                                                                     <a
                                                                                            href={`tel:${item.acceptedBy?.phone}`}
-                                                                                           className="flex items-center text-gray-600 justify-center gap-2  mt-3 px-4 py-2 rounded-xl  bg-linear-to-r from-green-500 to-emerald-600 text-sm font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-200"
+                                                                                           className="flex items-center text-white justify-center gap-2  mt-3 px-4 py-2 rounded-xl  bg-linear-to-r from-green-500 to-emerald-600 text-sm font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-200"
                                                                                     >
                                                                                            📞 Call NGO
                                                                                     </a>
