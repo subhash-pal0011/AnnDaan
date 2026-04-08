@@ -70,6 +70,7 @@ export async function POST(req) {
                      );
               }
 
+
               const newDonation = await Donation.create({
                      user: session.user.id,
                      food,
@@ -93,28 +94,6 @@ export async function POST(req) {
                      safetyScore,
                      notes,
               });
-
-              // REALTIME>>>
-              // HUM DIRECT BHI DATA:NEWdONATION KR STE HII BUT ITS BEST
-              await eventHandler({ 
-                     eventName: "new-food",
-                     data: {
-                            _id: newDonation._id,
-
-                            foodId: {
-                                   ...newDonation._doc 
-                            },
-
-                            donationUserId: {
-                                   _id: session.user.id,
-                                   name: session.user.name,
-                                   phone: session.user.phone
-                            },
-
-                            ngoStatus: "assigned",
-                            createdAt: new Date()
-                     }
-              })
 
 
               let nearbyNgos = [];
@@ -140,12 +119,11 @@ export async function POST(req) {
                      }
               }
 
-              // No NGO found
               if (nearbyNgos.length === 0) {
                      return NextResponse.json(
                             {
                                    success: true,
-                                   message: "Donation saved 👍. No NGOs nearby right now.",
+                                   message: "Donation saved. No NGOs nearby",
                                    data: newDonation,
                                    notifiedNgos: 0,
                             },
@@ -153,22 +131,23 @@ export async function POST(req) {
                      );
               }
 
-              // FIND KR RHE HII JO BUSY HII  ( busy mtlb jinka status === ["accepted", "out_for_delivery"] ye ho isse FIND KR LENGE).
+
               const busyNgos = await Notification.distinct("ngoUserId", {
                      ngoStatus: { $in: ["accepted", "out_for_delivery"] },
               });
 
-              // FIND JO BUSY NGO NHI HII
-              const availableNgos = nearbyNgos.filter((ngo) =>
-                     !busyNgos.includes(ngo._id.toString())
+
+              const busySet = new Set(busyNgos.map((id) => id.toString()));
+
+              const availableNgos = nearbyNgos.filter(
+                     (ngo) => !busySet.has(ngo._id.toString())
               );
 
-              // KOI NGO NHI MILA TO.
               if (availableNgos.length === 0) {
                      return NextResponse.json(
                             {
                                    success: true,
-                                   message: "All nearby NGOs are busy 😕. Please wait.",
+                                   message: "All NGOs busy 😕",
                                    data: newDonation,
                                    totalNearby: nearbyNgos.length,
                                    busyNgos: busyNgos.length,
@@ -178,20 +157,51 @@ export async function POST(req) {
                      );
               }
 
+
               const notifications = availableNgos.map((ngo) => ({
                      foodId: newDonation._id,
                      donationUserId: session.user.id,
                      ngoUserId: ngo._id,
                      ngoStatus: "assigned",
-                     isNotified: true,
+                     isNotified: false,
               }));
 
-              await Notification.insertMany(notifications);
+
+              const createdNotifications = await Notification.insertMany(notifications);
+
+
+
+              for (let notif of createdNotifications) {
+
+                     const isBusy = await Notification.findOne({
+                            ngoUserId: notif.ngoUserId,
+                            ngoStatus: { $in: ["accepted", "out_for_delivery"] },
+                     });
+
+                     if (isBusy) continue;
+
+                     await eventHandler({
+                            eventName: "new-food",
+                            room: notif.ngoUserId.toString(),
+                            data: {
+                                   _id: notif._id,
+                                   foodId: newDonation,
+                                   donationUserId: {
+                                          _id: session.user.id,
+                                          name: session.user.name,
+                                          phone: session.user.phone,
+                                   },
+                                   ngoUserId: notif.ngoUserId,
+                                   ngoStatus: notif.ngoStatus,
+                                   createdAt: notif.createdAt,
+                            },
+                     });
+              }
 
               return NextResponse.json(
                      {
                             success: true,
-                            message: "Donation created & NGOs notified",
+                            message: "Donation created & notified available NGOs ✅",
                             data: newDonation,
                             totalNearby: nearbyNgos.length,
                             busyNgos: busyNgos.length,
@@ -199,7 +209,6 @@ export async function POST(req) {
                      },
                      { status: 201 }
               );
-
        } catch (error) {
               console.error("Donation API Error:", error);
               return NextResponse.json(
@@ -212,3 +221,4 @@ export async function POST(req) {
               );
        }
 }
+
