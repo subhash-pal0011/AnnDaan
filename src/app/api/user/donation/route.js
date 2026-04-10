@@ -102,6 +102,7 @@ export async function POST(req) {
               for (let radius of radiusList) {
                      const ngos = await User.find({
                             role: "ngo",
+                            isOnline: true,
                             location: {
                                    $near: {
                                           $geometry: {
