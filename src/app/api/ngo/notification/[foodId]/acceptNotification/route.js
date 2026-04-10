@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import connectDb from "@/db/connectDb";
 import notiifcation from "@/model/notification";
 import Donation from "@/model/donation";
+import eventHandler from "@/lib/eventHandler";
 
 export async function POST(req, { params }) {
        try {
@@ -51,10 +52,19 @@ export async function POST(req, { params }) {
                             ngoStatus: "accepted",
                             ngoUserId: ngoId,
                      },
-                     {
-                            returnDocument: "after", 
-                     }
               );
+
+              await eventHandler({
+                     eventName: "donation-accepted",
+                     data: {
+                            foodId: notification.foodId,
+                            acceptedBy: {
+                                   _id: session.user.id,
+                                   name: session.user.name,
+                                   phone: session.user.phone,
+                            },
+                     },
+              });
 
               if (!notification) {
                      return NextResponse.json(
