@@ -247,7 +247,7 @@ const MainPage = () => {
                                    Join us and help reduce food waste today.
                             </motion.p>
 
-                            <motion.button
+                            <motion.button onClick={()=>router.push("/myDonations")}
                                    initial={{ opacity: 0, scale: 0.8 }}
                                    whileInView={{ opacity: 1, scale: 1 }}
                                    transition={{ delay: 0.4, duration: 0.5 }}
