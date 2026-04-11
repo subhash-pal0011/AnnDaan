@@ -58,6 +58,7 @@ const DonatePage = () => {
                      console.log("fetch address using lat lng error:", error);
               }
        };
+
        useEffect(() => {
               fetchAddress();
        }, [position]);
@@ -97,6 +98,7 @@ const DonatePage = () => {
                      setValue("foodStatus", res.data.status);
                      setValue("color", res.data.color);
                      setValue("safetyScore", res.data.safetyScore);
+                     console.log("resAi :", res.data.status)
 
               } catch (err) {
                      console.log(err);
@@ -114,17 +116,35 @@ const DonatePage = () => {
 
 
        const onSubmit = async (data) => {
+              console.log("FORM DATA:", data);
+
+              if (!position) {
+                     toast.error("Location not found");
+                     return;
+              }
+
+              const formattedData = {
+                     ...data,
+                     address: data.location,
+                     location: {
+                            type: "Point",
+                            coordinates: [position[1], position[0]],
+                     },
+              };
+
               try {
-                     const res = await axios.post("/api/user/donation", data)
+                     const res = await axios.post("/api/user/donation", formattedData);
+
                      if (res.data.success) {
-                            toast.success(res.data.message)
-                            reset()
+                            toast.success(res.data.message);
+                            reset();
                      }
               } catch (error) {
-                     console.log("donation form error :", error)
-                     toast.error(error?.response?.data?.message)
+                     console.log("donation form error :", error);
+                     toast.error(error?.response?.data?.message);
               }
        };
+
 
        return (
               <div className="min-h-screen bg-linear-to-br from-green-100 to-orange-100 flex w-full items-center p-2">
@@ -412,9 +432,9 @@ const DonatePage = () => {
                                           disabled={isSubmitting || watch("foodStatus") === "Unsafe"}
                                           className={`cursor-pointer w-full py-2 text-center items-center justify-center flex rounded-lg text-white ${watch("foodStatus") === "Unsafe" ? "bg-gray-400 cursor-not-allowed" :
                                                  "bg-green-600 hover:bg-green-700"
-                                          }`}
+                                                 }`}
                                    >
-                                          {isSubmitting ? <img src="/loader.gif" className="h-7"/> :  "Submit Donation"}
+                                          {isSubmitting ? <img src="/loader.gif" className="h-7" /> : "Submit Donation"}
                                    </button>
 
                             </motion.form>
