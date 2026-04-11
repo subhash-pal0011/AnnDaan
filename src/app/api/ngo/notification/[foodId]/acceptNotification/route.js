@@ -52,6 +52,9 @@ export async function POST(req, { params }) {
                             ngoStatus: "accepted",
                             ngoUserId: ngoId,
                      },
+                     {
+                            returnDocument: "after"
+                     }
               );
 
               await eventHandler({
@@ -85,12 +88,6 @@ export async function POST(req, { params }) {
                      foodId: notification.foodId,
                      _id: { $ne: notification._id },
               });
-
-              // 🔥 OPTIONAL: real-time event (recommended)
-              // await eventHandler({
-              //        eventName: "ngo-accepted",
-              //        data: notification,
-              // });
 
               return NextResponse.json(
                      {
