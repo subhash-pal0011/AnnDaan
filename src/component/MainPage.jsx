@@ -2,12 +2,12 @@
 import { useRouter } from "next/navigation";
 import React from "react";
 import { motion } from "framer-motion";
-import { useSession } from "next-auth/react";
+import { useSelector } from "react-redux";
 
 const MainPage = () => {
        const router = useRouter()
-       const session = useSession()
-       const role = session?.data?.user?.role
+       const {userData} = useSelector((state)=>state.user)
+       const role = userData?.role
 
        return (
               <div className="w-full min-h-screen bg-gray-50">
