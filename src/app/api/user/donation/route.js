@@ -167,10 +167,7 @@ export async function POST(req) {
                      isNotified: false,
               }));
 
-
               const createdNotifications = await Notification.insertMany(notifications);
-
-
 
               for (let notif of createdNotifications) {
 
