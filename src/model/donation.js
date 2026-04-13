@@ -89,7 +89,7 @@ const DonationSchema = new mongoose.Schema(
 
               status: {
                      type: String,
-                     enum: ["Pending", "Accepted", "Picked"],
+                     enum: ["Pending", "Accepted", "Picked", "Delivered"],
                      default: "Pending",
                      index: true,
               },
@@ -123,6 +123,10 @@ const DonationSchema = new mongoose.Schema(
                      type: String,
                      trim: true,
               },
+              otpVerified: {
+                     type: Boolean,
+                     default: false,
+              }
        },
        { timestamps: true }
 );
