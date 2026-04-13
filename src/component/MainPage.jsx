@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 
 const MainPage = () => {
        const router = useRouter()
-       const {userData} = useSelector((state)=>state.user)
+       const { userData } = useSelector((state) => state.user)
        const role = userData?.role
 
        return (
@@ -247,18 +247,20 @@ const MainPage = () => {
                                    Join us and help reduce food waste today.
                             </motion.p>
 
-                            <motion.button onClick={()=>router.push("/myDonations")}
+                            <motion.button
+                                   onClick={() =>
+                                          role === "organizer" ? router.push("/myDonations") : router.push("/ngo/ngoNotification")
+                                   }
                                    initial={{ opacity: 0, scale: 0.8 }}
                                    whileInView={{ opacity: 1, scale: 1 }}
                                    transition={{ delay: 0.4, duration: 0.5 }}
                                    viewport={{ once: false }}
                                    whileHover={{ scale: 1.08 }}
                                    whileTap={{ scale: 0.95 }}
-                                   className="bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600 shadow-lg"
+                                   className="bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600 shadow-lg cursor-pointer"
                             >
                                    Get Started
                             </motion.button>
-
                      </section>
 
               </div >
