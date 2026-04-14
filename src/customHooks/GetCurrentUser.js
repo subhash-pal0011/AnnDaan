@@ -12,7 +12,6 @@ const GetCurrentUser = () => {
               const fetchUser = async () => {
                      try {
                             const res = await axios.get("/api/currentUser")
-                            console.log("response:", res)
 
                             if (res.data.success) {
                                    dispatch(setUserData(res.data.data))
