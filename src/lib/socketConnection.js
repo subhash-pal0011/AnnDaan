@@ -7,6 +7,9 @@ export const socketConnection = () => {
               socket = io(process.env.NEXT_PUBLIC_NODE_SOCKET_URL, {
                      transports: ["websocket"],
               });
+       } else if (!socket.connected) {
+              socket.connect();
        }
+
        return socket;
 };
