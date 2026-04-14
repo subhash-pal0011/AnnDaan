@@ -4,7 +4,8 @@ import { getToken } from "next-auth/jwt";
 export async function proxy(req) {
        const pathname = req.nextUrl.pathname;
 
-       const publicPaths = ["/register", "/api/auth"];
+       // const publicPaths = ["/register", "/api/auth"];
+       const publicPaths = ["/register", "/api/auth", "/role"];
        const isPublicPath = publicPaths.some((path) =>
               pathname.startsWith(path)
        );
