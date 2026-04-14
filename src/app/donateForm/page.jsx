@@ -84,30 +84,39 @@ const DonatePage = () => {
 
        const watchAll = watch();
 
-       //  AI CALL.
        const handleAISuggestion = async () => {
               const data = watchAll;
+
               if (!data.food || !data.date || !data.time || !data.foodType || !data.period) {
+                     toast.error("Please fill all required fields");
                      return;
               }
+
               try {
                      setAiLoading(true);
+
                      const res = await axios.post("/api/user/ai", data);
-                     setValue("notes", res.data.note);
-                     setValue("expiry", res.data.expiry);
-                     setValue("foodStatus", res.data.status);
-                     setValue("color", res.data.color);
-                     setValue("safetyScore", res.data.safetyScore);
-                     console.log("resAi :", res.data.status)
+
+                     const result = res?.data;
+
+                     if (res.status === 200 && result) {
+                            setValue("notes", result.note || "");
+                            setValue("expiry", result.expiry || "");
+                            setValue("foodStatus", result.status || "");
+                            setValue("color", result.color || "");
+                            setValue("safetyScore", result.safetyScore || 0);
+                     } else {
+                            toast.info(result?.message || "Unable to generate suggestion");
+                     }
 
               } catch (err) {
-                     console.log(err);
-                     alert("AI error");
+                     console.log("AI ERROR:", err);
+
+                     toast.error(err?.response?.data?.error || "Something went wrong");
               } finally {
                      setAiLoading(false);
               }
        };
-
        useEffect(() => {
               if (watchAll.food && watchAll.date && watchAll.time && watchAll.foodType && watchAll.period) {
                      handleAISuggestion();
