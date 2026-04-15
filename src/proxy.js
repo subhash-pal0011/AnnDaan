@@ -71,31 +71,29 @@
 // };
 
 
-
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { auth } from "./auth";
 
-export async function proxy(req) {
+export async function middleware(req) {
+       const session = await auth();
        const pathname = req.nextUrl.pathname;
 
        const publicPaths = ["/register", "/api/auth", "/role"];
+
        const isPublicPath = publicPaths.some((path) =>
               pathname.startsWith(path)
        );
 
-       const token = await getToken({
-              req,
-              secret: process.env.NEXTAUTH_SECRET,
-       });
-
-       console.log("TOKEN:", token);
+       console.log("SESSION:", session);
        console.log("PATH:", pathname);
 
-       if (!token && !isPublicPath) {
+       // 🚨 Not logged in → block private routes
+       if (!session && !isPublicPath) {
               return NextResponse.redirect(new URL("/register", req.url));
        }
 
-       if (token && pathname.startsWith("/register")) {
+       // 🚨 Logged in → don't allow register page
+       if (session && pathname.startsWith("/register")) {
               return NextResponse.redirect(new URL("/", req.url));
        }
 
@@ -104,6 +102,6 @@ export async function proxy(req) {
 
 export const config = {
        matcher: [
-              "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico)$).*)",
+              "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg)$).*)",
        ],
 };
