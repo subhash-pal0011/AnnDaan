@@ -77,35 +77,47 @@ import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function proxy(req) {
-  const pathname = req.nextUrl.pathname;
+       const pathname = req.nextUrl.pathname;
 
-  const publicPaths = ["/register", "/api/auth", "/role"];
-  const isPublicPath = publicPaths.some((path) =>
-    pathname.startsWith(path)
-  );
+       const publicPaths = ["/register", "/api/auth", "/role"];
+       const isPublicPath = publicPaths.some((path) =>
+              pathname.startsWith(path)
+       );
 
-  const token = await getToken({
-    req,
-    secret: process.env.NEXTAUTH_SECRET,
-    secureCookie: true, // 🔥 IMPORTANT FIX
-  });
+       const token = await getToken({
+              req,
+              secret: process.env.NEXTAUTH_SECRET,
+              secureCookie: true,
+       });
 
-  console.log("TOKEN:", token);
-  console.log("PATH:", pathname);
+       // 🔥 DEBUG LOGS (IMPORTANT FOR DEPLOYMENT)
+       console.log("========== MIDDLEWARE DEBUG ==========");
+       console.log("token :" ,token)
+       console.log("PATH:", pathname);
+       console.log("IS_PUBLIC:", isPublicPath);
+       console.log("TOKEN EXISTS:", !!token);
+       console.log("USER ID:", token?.id || null);
+       console.log("USER ROLE:", token?.role || null);
+       console.log("======================================");
 
-  if (!token && !isPublicPath) {
-    return NextResponse.redirect(new URL("/register", req.url));
-  }
+       // ❌ Not logged in → block private routes
+       if (!token && !isPublicPath) {
+              console.log("REDIRECT: NO TOKEN → /register");
+              return NextResponse.redirect(new URL("/register", req.url));
+       }
 
-  if (token && pathname.startsWith("/register")) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
+       // ❌ Logged in user → don't allow register page
+       if (token && pathname.startsWith("/register")) {
+              console.log("REDIRECT: LOGGED IN USER → /");
+              return NextResponse.redirect(new URL("/", req.url));
+       }
 
-  return NextResponse.next();
+       console.log("ALLOW REQUEST:", pathname);
+       return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico)$).*)",
-  ],
+       matcher: [
+              "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico)$).*)",
+       ],
 };
