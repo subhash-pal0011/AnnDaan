@@ -91,6 +91,7 @@ export async function proxy(req) {
 
        // 🔥 DEBUG LOGS (IMPORTANT FOR DEPLOYMENT)
        console.log("========== MIDDLEWARE DEBUG ==========");
+       console.log("token :" ,token)
        console.log("PATH:", pathname);
        console.log("IS_PUBLIC:", isPublicPath);
        console.log("TOKEN EXISTS:", !!token);
