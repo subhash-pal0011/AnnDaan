@@ -86,7 +86,7 @@ export async function proxy(req) {
 
        const token = await getToken({
               req,
-              secret: process.env.AUTH_SECRET,
+              secret: process.env.NEXTAUTH_SECRET,
        });
 
        // 🔥 DEBUG LOGS (IMPORTANT FOR DEPLOYMENT)
