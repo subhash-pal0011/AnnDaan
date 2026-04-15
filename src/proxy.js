@@ -74,7 +74,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "./auth";
 
-export async function middleware(req) {
+export async function proxy(req) {
        const session = await auth();
        const pathname = req.nextUrl.pathname;
 
