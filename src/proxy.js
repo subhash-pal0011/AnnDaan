@@ -76,7 +76,7 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-export async function middleware(req) {
+export async function proxy(req) {
   const pathname = req.nextUrl.pathname;
 
   const publicPaths = ["/register", "/api/auth", "/role"];
