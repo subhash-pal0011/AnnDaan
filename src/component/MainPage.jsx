@@ -53,7 +53,7 @@ const MainPage = () => {
                                    >
                                           {role === "organizer" ?
                                                  <button
-                                                        onClick={() => router.push("/myDonations")}
+                                                        onClick={() => router.push("/user/myDonations")}
                                                         className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold flex gap-1 items-center cursor-pointer"
                                                  >
                                                         Donate Food
@@ -249,7 +249,7 @@ const MainPage = () => {
 
                             <motion.button
                                    onClick={() =>
-                                          role === "organizer" ? router.push("/myDonations") : router.push("/ngo/ngoNotification")
+                                          role === "organizer" ? router.push("/user/myDonations") : router.push("/ngo/ngoNotification")
                                    }
                                    initial={{ opacity: 0, scale: 0.8 }}
                                    whileInView={{ opacity: 1, scale: 1 }}
