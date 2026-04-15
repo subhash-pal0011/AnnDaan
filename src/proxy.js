@@ -19,6 +19,16 @@ export async function proxy(req) {
               return NextResponse.redirect(new URL("/", req.url));
        }
 
+       const role = session?.user?.role;
+
+       if (pathname.startsWith("/user") && role !== "organizer") {
+              return NextResponse.redirect(new URL("/not_access_page", req.url));
+       }
+
+       if (pathname.startsWith("/ngo") && role !== "ngo") {
+              return NextResponse.redirect(new URL("/not_access_page", req.url));
+       }
+
        return NextResponse.next();
 }
 
