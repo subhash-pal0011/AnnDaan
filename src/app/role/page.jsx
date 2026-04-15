@@ -91,7 +91,6 @@ const Page = () => {
                                                  <option value="">Select Your Role</option>
                                                  <option value="organizer">Event Organizer</option>
                                                  <option value="ngo">NGO</option>
-                                                 <option value="restaurant">Restaurant</option>
                                           </select>
 
                                           {errors.role && (
