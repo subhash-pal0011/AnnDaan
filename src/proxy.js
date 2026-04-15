@@ -72,7 +72,6 @@
 
 
 
-
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
@@ -87,32 +86,19 @@ export async function proxy(req) {
        const token = await getToken({
               req,
               secret: process.env.NEXTAUTH_SECRET,
-              secureCookie: true,
        });
 
-       // 🔥 DEBUG LOGS (IMPORTANT FOR DEPLOYMENT)
-       console.log("========== MIDDLEWARE DEBUG ==========");
-       console.log("token :" ,token)
+       console.log("TOKEN:", token);
        console.log("PATH:", pathname);
-       console.log("IS_PUBLIC:", isPublicPath);
-       console.log("TOKEN EXISTS:", !!token);
-       console.log("USER ID:", token?.id || null);
-       console.log("USER ROLE:", token?.role || null);
-       console.log("======================================");
 
-       // ❌ Not logged in → block private routes
        if (!token && !isPublicPath) {
-              console.log("REDIRECT: NO TOKEN → /register");
               return NextResponse.redirect(new URL("/register", req.url));
        }
 
-       // ❌ Logged in user → don't allow register page
        if (token && pathname.startsWith("/register")) {
-              console.log("REDIRECT: LOGGED IN USER → /");
               return NextResponse.redirect(new URL("/", req.url));
        }
 
-       console.log("ALLOW REQUEST:", pathname);
        return NextResponse.next();
 }
 
