@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🍱 AnnDaan
 
-## Getting Started
+AnnDaan is a full-stack MERN web application that helps reduce food waste by connecting donors with needy people and NGOs.
 
-First, run the development server:
+Users can donate extra food, and NGOs or volunteers can collect and distribute it to people in need.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Features
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- 🔐 User Authentication & Authorization
+- 🍲 Food Donation Posting
+- 📍 Location-based Donation Details
+- 🧑‍🤝‍🧑 NGO / Receiver Management
+- 📦 Donation Tracking
+- 📱 Responsive UI
+- ⚡ REST API Integration
+- ☁️ MongoDB Database Support
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+### Frontend
+- Next.js
+- React.js
+- Tailwind CSS
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Backend
+- Next.js API Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Database
+- MongoDB
 
-## Deploy on Vercel
+### Authentication
+- NextAuth.js
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🌐 Live Demo
+
+🔗 https://ann-daan-mrq8.vercel.app/register
